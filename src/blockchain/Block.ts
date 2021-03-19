@@ -1,5 +1,6 @@
+
 export class Block {
-    constructor(private timestamp: Date, private hash: String, private lastHash: String, private data: String) { }
+    constructor(public timestamp: Date, public lastHash: String, public hash: String, public data: String) { }
 }
 
 
