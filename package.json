@@ -4,6 +4,9 @@
   "description": "blockchain fullstack app",
   "main": "index.js",
   "scripts": {
+    "start": "node build/index.js",
+    "dev": "nodemon src/*.ts",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,6 +28,8 @@
   "homepage": "https://github.com/elPoeta/blockchain-fullstack-app#readme",
   "devDependencies": {
     "@types/jest": "^26.0.15",
-    "jest": "^26.6.0"
+    "@types/node": "^14.14.35",
+    "jest": "^26.6.0",
+    "ts-node": "^9.1.1"
   }
 }
