@@ -1,7 +1,7 @@
 import { GENESIS_DATA } from '../config/config';
 import { Block } from './Block';
 describe('Block', () => {
-    const timestamp: Date = new Date();
+    const timestamp: Number = Date.now();
     const lastHash: String = 'elPoeta-lastHash';
     const hash: String = 'elPoeta-hash';
     const data: Array<String> = ['elPoeta'];
@@ -25,5 +25,28 @@ describe('Block', () => {
             expect(genesisBlock.timestamp).toEqual(GENESIS_DATA.timestamp);
             expect(genesisBlock.data).toEqual(GENESIS_DATA.data);
         })
+    })
+
+    describe('mine()', () => {
+        const lastBlock = Block.genesis();
+        const data = 'mined-block';
+        const minedBlock = Block.mine(lastBlock, data);
+
+        it('returns a block instance', () => {
+            expect(lastBlock instanceof Block).toBe(true);
+        })
+
+        it('set the `lastHash to be the hash of the lastBlock`', () => {
+            expect(minedBlock.lastHash).toEqual(lastBlock.hash);
+        })
+
+        it('set data', () => {
+            expect(minedBlock.data[0]).toEqual(data);
+        })
+
+        it('set timestamp', () => {
+            expect(minedBlock.timestamp).not.toEqual(undefined);
+        })
+
     })
 })

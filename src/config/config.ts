@@ -1,5 +1,5 @@
 export const GENESIS_DATA = {
-    timestamp: new Date(),
+    timestamp: Date.now(),
     lastHash: '--------',
     hash: 'hash-one',
     data: []
