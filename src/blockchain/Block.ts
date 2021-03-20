@@ -1,6 +1,11 @@
-
+import { GENESIS_DATA } from '../config/config';
 export class Block {
-    constructor(private _timestamp: Date, private _lastHash: String, private _hash: String, private _data: String) { }
+    constructor(private _timestamp: Date, private _lastHash: String, private _hash: String, private _data: Array<String>) { }
+
+    static genesis() {
+        const { timestamp, lastHash, hash, data } = GENESIS_DATA;
+        return new this(timestamp, lastHash, hash, data);
+    }
 
     get timestamp(): Date {
         return this._timestamp;
@@ -27,13 +32,14 @@ export class Block {
         this._hash = hash;
     }
 
-    get data(): String {
+    get data(): Array<String> {
         return this._data;
     }
 
-    set data(data: String) {
+    set data(data: Array<String>) {
         this._data = data;
     }
+
 }
 
 
