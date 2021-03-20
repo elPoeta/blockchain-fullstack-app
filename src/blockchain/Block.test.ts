@@ -1,10 +1,11 @@
 import { GENESIS_DATA } from '../config/config';
+import cryptoHash from '../cryptoHash/cryptoHash';
 import { Block } from './Block';
 describe('Block', () => {
     const timestamp: Number = Date.now();
     const lastHash: String = 'elPoeta-lastHash';
     const hash: String = 'elPoeta-hash';
-    const data: Array<String> = ['elPoeta'];
+    const data: Array<String> = ['elPoeta', 'data'];
     const block = new Block(timestamp, lastHash, hash, data);
     it('has a timestamp, lastHash, hash and data property', () => {
         expect(block.timestamp).toEqual(timestamp);
@@ -29,7 +30,7 @@ describe('Block', () => {
 
     describe('mine()', () => {
         const lastBlock = Block.genesis();
-        const data = 'mined-block';
+        const data = ['mined-block'];
         const minedBlock = Block.mine(lastBlock, data);
 
         it('returns a block instance', () => {
@@ -41,11 +42,15 @@ describe('Block', () => {
         })
 
         it('set data', () => {
-            expect(minedBlock.data[0]).toEqual(data);
+            expect(minedBlock.data).toEqual(data);
         })
 
         it('set timestamp', () => {
             expect(minedBlock.timestamp).not.toEqual(undefined);
+        })
+
+        it('create hash based on inputs', () => {
+            expect(minedBlock.hash).toEqual(cryptoHash(minedBlock.timestamp.toString(), minedBlock.lastHash, ...data));
         })
 
     })
