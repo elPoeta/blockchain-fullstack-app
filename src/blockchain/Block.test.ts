@@ -1,6 +1,8 @@
 import { GENESIS_DATA, MINE_RATE } from '../config/config';
 import cryptoHash from '../cryptoHash/cryptoHash';
 import { Block } from './Block';
+import { hexToBinary } from '../utils/hexToBinary';
+
 describe('Block', () => {
     const timestamp: number = 2000;
     const lastHash: String = 'elPoeta-lastHash';
@@ -57,7 +59,7 @@ describe('Block', () => {
             expect(minedBlock.hash).toEqual(cryptoHash(minedBlock.nonce, minedBlock.difficulty, minedBlock.timestamp, minedBlock.lastHash, ...data));
         })
         it('set hash that macht the difficulty criteria', () => {
-            expect(minedBlock.hash.substring(0, minedBlock.difficulty)).toEqual('0'.repeat(minedBlock.difficulty));
+            expect(hexToBinary(minedBlock.hash).substring(0, minedBlock.difficulty)).toEqual('0'.repeat(minedBlock.difficulty));
         });
         it('adjust the difficulty', () => {
             const possibleResults = [lastBlock.difficulty + 1, lastBlock.difficulty - 1];

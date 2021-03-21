@@ -1,5 +1,7 @@
 import { GENESIS_DATA, MINE_RATE } from '../config/config';
 import cryptoHash from '../cryptoHash/cryptoHash';
+import { hexToBinary } from '../utils/hexToBinary';
+
 export class Block {
     constructor(private _nonce: number, private _difficulty: number, private _timestamp: number, private _lastHash: String, private _hash: String, private _data: Array<String>) { }
 
@@ -19,7 +21,7 @@ export class Block {
             timestamp = Date.now();
             difficulty = Block.adjustDifficulty(lastBlock, timestamp);
             hash = cryptoHash(nonce, difficulty, timestamp, lastHash, ...newData);
-        } while (hash.substring(0, difficulty) !== '0'.repeat(difficulty));
+        } while (hexToBinary(hash).substring(0, difficulty) !== '0'.repeat(difficulty));
         return new this(nonce, difficulty, timestamp, lastHash, hash, newData);
     }
 
