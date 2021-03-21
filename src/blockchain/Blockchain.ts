@@ -17,9 +17,11 @@ export class Blockchain {
         for (let i = 1; i < chain.length; i++) {
             const { nonce, difficulty, timestamp, lastHash, hash, data } = chain[i];
             const actuaLastHash = chain[i - 1].hash;
+            const lastDifficulty = chain[i - 1].difficulty;
             if (lastHash !== actuaLastHash) return false;
             const validHash = cryptoHash(nonce, difficulty, timestamp, lastHash, ...data);
             if (hash !== validHash) return false;
+            if ((lastDifficulty - difficulty) > 1) return false;
         }
         return true;
     }
