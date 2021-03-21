@@ -1,25 +1,47 @@
 import { GENESIS_DATA } from '../config/config';
 import cryptoHash from '../cryptoHash/cryptoHash';
 export class Block {
-    constructor(private _timestamp: Number, private _lastHash: String, private _hash: String, private _data: Array<String>) { }
+    constructor(private _nonce: number, private _difficulty: number, private _timestamp: number, private _lastHash: String, private _hash: String, private _data: Array<String>) { }
 
     static genesis(): Block {
-        const { timestamp, lastHash, hash, data } = GENESIS_DATA;
-        return new this(timestamp, lastHash, hash, data);
+        const { nonce, difficulty, timestamp, lastHash, hash, data } = GENESIS_DATA;
+        return new this(nonce, difficulty, timestamp, lastHash, hash, data);
     }
 
     static mine(lastBlock: Block, newData: Array<String>): Block {
-        const timestamp = Date.now();
+        let timestamp: number;
+        let hash: String;
+        let nonce = 0;
         const lastHash = lastBlock.hash;
-        const hash = cryptoHash(timestamp.toString(), lastHash, ...newData);
-        return new this(timestamp, lastHash, hash, newData);
+        const difficulty = lastBlock.difficulty;
+        do {
+            nonce++;
+            timestamp = Date.now();
+            hash = cryptoHash(nonce, difficulty, timestamp, lastHash, ...newData);
+        } while (hash.substring(0, difficulty) !== '0'.repeat(difficulty));
+        return new this(nonce, difficulty, timestamp, lastHash, hash, newData);
+    }
+    get nonce(): number {
+        return this._nonce;
     }
 
-    get timestamp(): Number {
+    set nonce(nonce: number) {
+        this._nonce = nonce;
+    }
+
+    get difficulty(): number {
+        return this._difficulty;
+    }
+
+    set difficulty(difficulty: number) {
+        this._difficulty = difficulty;
+    }
+
+    get timestamp(): number {
         return this._timestamp;
     }
 
-    set timestamp(timestamp: Number) {
+    set timestamp(timestamp: number) {
         this._timestamp = timestamp;
     }
 
