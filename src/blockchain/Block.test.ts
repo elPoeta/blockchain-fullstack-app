@@ -1,8 +1,8 @@
-import { GENESIS_DATA } from '../config/config';
+import { GENESIS_DATA, MINE_RATE } from '../config/config';
 import cryptoHash from '../cryptoHash/cryptoHash';
 import { Block } from './Block';
 describe('Block', () => {
-    const timestamp: number = Date.now();
+    const timestamp: number = 2000;
     const lastHash: String = 'elPoeta-lastHash';
     const hash: String = 'elPoeta-hash';
     const data: Array<String> = ['elPoeta', 'data'];
@@ -30,7 +30,7 @@ describe('Block', () => {
             expect(genesisBlock.timestamp).toEqual(GENESIS_DATA.timestamp);
             expect(genesisBlock.data).toEqual(GENESIS_DATA.data);
         })
-    })
+    });
 
     describe('mine()', () => {
         const lastBlock = Block.genesis();
@@ -59,5 +59,17 @@ describe('Block', () => {
         it('set hash that macht the difficulty criteria', () => {
             expect(minedBlock.hash.substring(0, minedBlock.difficulty)).toEqual('0'.repeat(minedBlock.difficulty));
         })
+    });
+
+    describe('adjustDifficulty()', () => {
+        it('raises the difficulty for quickly mined block', () => {
+            expect(Block.adjustDifficulty(block, block.timestamp + MINE_RATE - 100)).toEqual(block.difficulty + 1);
+        });
+
+        it('lowers the difficulty for slowly mined block', () => {
+            expect(Block.adjustDifficulty(block, block.timestamp + MINE_RATE + 100)).toEqual(block.difficulty - 1);
+
+
+        });
     })
 })

@@ -1,4 +1,4 @@
-import { GENESIS_DATA } from '../config/config';
+import { GENESIS_DATA, MINE_RATE } from '../config/config';
 import cryptoHash from '../cryptoHash/cryptoHash';
 export class Block {
     constructor(private _nonce: number, private _difficulty: number, private _timestamp: number, private _lastHash: String, private _hash: String, private _data: Array<String>) { }
@@ -21,6 +21,13 @@ export class Block {
         } while (hash.substring(0, difficulty) !== '0'.repeat(difficulty));
         return new this(nonce, difficulty, timestamp, lastHash, hash, newData);
     }
+
+    static adjustDifficulty(originalBlock: Block, timestamp: number): number {
+        const { difficulty } = originalBlock;
+        if (timestamp - originalBlock.timestamp > MINE_RATE) return difficulty - 1;
+        return difficulty + 1;
+    }
+
     get nonce(): number {
         return this._nonce;
     }
