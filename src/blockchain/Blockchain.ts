@@ -15,11 +15,13 @@ export class Blockchain {
     static isValidChain(chain: Array<Block>): Boolean {
         if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis())) return false;
         for (let i = 1; i < chain.length; i++) {
-            const { timestamp, lastHash, hash, data } = chain[i];
+            const { nonce, difficulty, timestamp, lastHash, hash, data } = chain[i];
             const actuaLastHash = chain[i - 1].hash;
+            const lastDifficulty = chain[i - 1].difficulty;
             if (lastHash !== actuaLastHash) return false;
-            const validHash = cryptoHash(timestamp.toString(), lastHash, ...data);
+            const validHash = cryptoHash(nonce, difficulty, timestamp, lastHash, ...data);
             if (hash !== validHash) return false;
+            if (Math.abs(lastDifficulty - difficulty) > 1) return false;
         }
         return true;
     }
