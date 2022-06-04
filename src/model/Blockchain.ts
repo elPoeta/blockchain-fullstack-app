@@ -2,7 +2,7 @@ import cryptoHash from "../utils/cryptoHash";
 import { Block } from "./Block";
 
 export class Blockchain {
-  public chain: Array<Block>;
+  public chain: any[];
   constructor() {
     this.chain = [Block.genesis()];
   }
@@ -13,7 +13,7 @@ export class Blockchain {
     this.chain.push(block);
   }
 
-  static isValidChain(chain: Array<Block>): Boolean {
+  static isValidChain(chain: any[]): Boolean {
     if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis()))
       return false;
     for (let i = 1; i < chain.length; i++) {
@@ -46,8 +46,4 @@ export class Blockchain {
     console.log("The chain replace with ", chain);
     this.chain = chain;
   }
-
-  // get chain(): Array<Block> {
-  //   return this._chain;
-  // }
 }
