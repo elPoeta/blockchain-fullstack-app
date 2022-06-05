@@ -27,6 +27,7 @@ export class Block {
   static genesis(): Block {
     return new this(GENESIS_DATA);
   }
+
   static mine({ lastBlock, data }: Minetype): Block {
     let timestamp: number;
     let hash: string;
@@ -37,7 +38,7 @@ export class Block {
       nonce++;
       timestamp = Date.now();
       difficulty = Block.adjustDifficulty(lastBlock, timestamp);
-      hash = cryptoHash(nonce, difficulty, timestamp, lastHash, ...data);
+      hash = cryptoHash(timestamp, lastHash, data, nonce, difficulty);
     } while (
       hexToBinary(hash).substring(0, difficulty) !== "0".repeat(difficulty)
     );

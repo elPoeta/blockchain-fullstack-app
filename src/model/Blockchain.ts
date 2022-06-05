@@ -13,7 +13,7 @@ export class Blockchain {
     this.chain.push(block);
   }
 
-  static isValidChain(chain: any[]): Boolean {
+  static isValidChain(chain: Block[]): Boolean {
     if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis()))
       return false;
     for (let i = 1; i < chain.length; i++) {
@@ -22,11 +22,7 @@ export class Blockchain {
       const lastDifficulty = chain[i - 1].difficulty;
       if (lastHash !== actuaLastHash) return false;
       const validHash = cryptoHash(
-        nonce,
-        difficulty,
-        timestamp,
-        lastHash,
-        ...data
+        timestamp, lastHash, data, nonce, difficulty
       );
       if (hash !== validHash) return false;
       if (Math.abs(lastDifficulty - difficulty) > 1) return false;

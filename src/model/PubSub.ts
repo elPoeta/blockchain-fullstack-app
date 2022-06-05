@@ -30,17 +30,19 @@ export class PubSub {
   }
 
   handleMessage(channel: string, message: string) {
+    console.log(`Message recieve from channel ${channel}. Message: ${message}`);
     if (channel === CHANNELS.BLOCKCHAIN) {
       const chain = JSON.parse(message) as Block[];
       this.blockchain.replaceChain(chain);
-    } else {
-      console.log(`Message recieve from channel ${channel}. Message: ${message}`);
     }
   }
 
   async publish({ channel, message }: { channel: string, message: string }) {
     await this.publisher?.connect();
+    await this.subscriber?.unsubscribe(channel)
     await this.publisher!.publish(channel, message);
+    await this.publisher!.quit();
+    this.subscribeChannel(channel);
   }
 
   broadcastChain() {

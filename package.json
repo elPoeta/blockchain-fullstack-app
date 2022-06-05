@@ -8,7 +8,7 @@
     "server": "npm run start:redis && cross-env ENV='development' nodemon -e ts --exec \"npm run compile\"",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "dev:peer": "cross-env GENERATE_PEER_PORT='true' ENV='development' nodemon -e ts --exec \"npm run compile\"",
+    "dev:peer": "cross-env GENERATE_PEER_PORT='true' ENV='development' nodemon dist/index.js",
     "start:redis": "redis-server --daemonize yes",
     "build": "tsc",
     "test:watch": "jest --watchAll",
@@ -42,6 +42,7 @@
     "typescript": "^4.7.2"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "express": "^4.18.1",
     "redis": "^4.1.0"
   }
