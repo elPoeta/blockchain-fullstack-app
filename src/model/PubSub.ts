@@ -4,12 +4,12 @@ import { Blockchain } from "./Blockchain";
 
 const CHANNELS = {
   TEST: "TEST",
-  BLOCKCHAIN: "BLOCKCHAIN"
+  BLOCKCHAIN: "BLOCKCHAIN",
 };
 
 export class PubSub {
-  public publisher: ReturnType<typeof createClient> | null;
-  public subscriber: ReturnType<typeof createClient> | null;
+  public publisher: ReturnType<typeof createClient>;
+  public subscriber: ReturnType<typeof createClient>;
   public blockchain: Blockchain;
 
   constructor({ blockchain }: { blockchain: Blockchain }) {
@@ -20,13 +20,16 @@ export class PubSub {
   }
 
   async subscribeToChannels() {
-    await this.subscriber?.connect();
-    Object.values(CHANNELS)
-      .forEach(channel => this.subscribeChannel(channel));
+    await this.subscriber.connect();
+    Object.values(CHANNELS).forEach((channel) =>
+      this.subscribeChannel(channel)
+    );
   }
 
   async subscribeChannel(channel: string) {
-    await this.subscriber?.subscribe(channel, (message) => this.handleMessage(channel, message));
+    await this.subscriber.subscribe(channel, (message) =>
+      this.handleMessage(channel, message)
+    );
   }
 
   handleMessage(channel: string, message: string) {
@@ -37,16 +40,18 @@ export class PubSub {
     }
   }
 
-  async publish({ channel, message }: { channel: string, message: string }) {
-    await this.publisher?.connect();
-    await this.subscriber?.unsubscribe(channel)
-    await this.publisher!.publish(channel, message);
-    await this.publisher!.quit();
+  async publish({ channel, message }: { channel: string; message: string }) {
+    await this.publisher.connect();
+    await this.subscriber.unsubscribe(channel);
+    await this.publisher.publish(channel, message);
+    await this.publisher.quit();
     this.subscribeChannel(channel);
   }
 
   broadcastChain() {
-    this.publish({ channel: CHANNELS.BLOCKCHAIN, message: JSON.stringify(this.blockchain.chain) });
+    this.publish({
+      channel: CHANNELS.BLOCKCHAIN,
+      message: JSON.stringify(this.blockchain.chain),
+    });
   }
 }
-

@@ -2,12 +2,12 @@ import cryptoHash from "../utils/cryptoHash";
 import { Block } from "./Block";
 
 export class Blockchain {
-  public chain: any[];
+  public chain: Block[];
   constructor() {
     this.chain = [Block.genesis()];
   }
 
-  addBlock(data: any[]) {
+  addBlock(data: unknown) {
     const lastBlock = this.chain[this.chain.length - 1];
     const block = Block.mine({ lastBlock, data });
     this.chain.push(block);
@@ -17,12 +17,17 @@ export class Blockchain {
     if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis()))
       return false;
     for (let i = 1; i < chain.length; i++) {
-      const { nonce, difficulty, timestamp, lastHash, hash, data } = chain[i];
-      const actuaLastHash = chain[i - 1].hash;
+      const { nonce, difficulty, timestamp, previusHash, hash, data } =
+        chain[i];
+      const actuaPreviusHash = chain[i - 1].hash;
       const lastDifficulty = chain[i - 1].difficulty;
-      if (lastHash !== actuaLastHash) return false;
+      if (previusHash !== actuaPreviusHash) return false;
       const validHash = cryptoHash(
-        timestamp, lastHash, data, nonce, difficulty
+        timestamp,
+        previusHash,
+        data,
+        nonce,
+        difficulty
       );
       if (hash !== validHash) return false;
       if (Math.abs(lastDifficulty - difficulty) > 1) return false;

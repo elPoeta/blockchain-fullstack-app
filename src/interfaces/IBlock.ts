@@ -1,8 +1,8 @@
 export interface IBlockProps {
   timestamp: number;
   hash: string;
-  lastHash: string;
-  data: any[];
+  previusHash: string;
+  data: unknown;
   nonce: number;
   difficulty: number;
 }

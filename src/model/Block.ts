@@ -5,20 +5,20 @@ import { IBlockProps } from "../interfaces/IBlock";
 
 type Minetype = {
   lastBlock: Block;
-  data: any[];
+  data: unknown;
 };
 export class Block {
   public timestamp: number;
   public hash: string;
-  public lastHash: string;
-  public data: any[];
+  public previusHash: string;
+  public data: unknown;
   public nonce: number;
   public difficulty;
 
   constructor(blockProps: IBlockProps) {
     this.timestamp = blockProps.timestamp;
     this.hash = blockProps.hash;
-    this.lastHash = blockProps.lastHash;
+    this.previusHash = blockProps.previusHash;
     this.data = blockProps.data;
     this.nonce = blockProps.nonce;
     this.difficulty = blockProps.difficulty;
@@ -32,17 +32,17 @@ export class Block {
     let timestamp: number;
     let hash: string;
     let nonce = 0;
-    const lastHash = lastBlock.hash;
+    const previusHash = lastBlock.hash;
     let difficulty = lastBlock.difficulty;
     do {
       nonce++;
       timestamp = Date.now();
       difficulty = Block.adjustDifficulty(lastBlock, timestamp);
-      hash = cryptoHash(timestamp, lastHash, data, nonce, difficulty);
+      hash = cryptoHash(timestamp, previusHash, data, nonce, difficulty);
     } while (
       hexToBinary(hash).substring(0, difficulty) !== "0".repeat(difficulty)
     );
-    return new this({ nonce, difficulty, timestamp, lastHash, hash, data });
+    return new this({ nonce, difficulty, timestamp, previusHash, hash, data });
   }
 
   static adjustDifficulty(originalBlock: Block, timestamp: number): number {
