@@ -7,7 +7,7 @@ import { PubSub } from "./model/PubSub";
 const app = express();
 
 const DEFAULT_PORT = 4000;
-const DEFAULT_ROOT = `http://localhost:${DEFAULT_PORT}`;
+const DEFAULT_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
 const blockchain = new Blockchain();
 const pubSub = new PubSub({ blockchain });
 
@@ -28,9 +28,9 @@ app.post("/api/v1/mine", (req: Request, res: Response) => {
 
 const syncChains = async () => {
   try {
-    const { data } = await axios.get(`${DEFAULT_ROOT}/api/v1/blocks`);
+    const { data } = await axios.get(`${DEFAULT_ADDRESS}/api/v1/blocks`);
     const { blocks }: { blocks: Block[] } = data;
-    console.log("B## ", blocks)
+    console.log(blocks)
     blockchain.replaceChain(blocks);
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -52,5 +52,6 @@ const PORT = process.env.PORT || PEER_PORT! || DEFAULT_PORT;
 
 app.listen(PORT, () => {
   console.log(`Server ran in port: ${PORT}`);
-  syncChains();
+  if (PORT !== DEFAULT_PORT)
+    syncChains();
 });
