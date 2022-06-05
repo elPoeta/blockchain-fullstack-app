@@ -32,6 +32,7 @@
   },
   "homepage": "https://github.com/elPoeta/blockchain-fullstack-app#readme",
   "devDependencies": {
+    "@types/elliptic": "^6.4.14",
     "@types/express": "^4.17.13",
     "@types/jest": "^26.0.15",
     "@types/node": "^17.0.38",
@@ -43,6 +44,7 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
+    "elliptic": "^6.5.4",
     "express": "^4.18.1",
     "redis": "^4.1.0"
   }
