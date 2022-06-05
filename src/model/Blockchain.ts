@@ -13,7 +13,7 @@ export class Blockchain {
     this.chain.push(block);
   }
 
-  static isValidChain(chain: any[]): Boolean {
+  static isValidChain(chain: Block[]): Boolean {
     if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis()))
       return false;
     for (let i = 1; i < chain.length; i++) {
