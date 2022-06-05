@@ -6,16 +6,16 @@ import { hexToBinary } from "../src/utils/hexToBinary";
 describe("Block", () => {
   const blockProps = {
     timestamp: 2000,
-    lastHash: "elPoeta-lastHash",
-    hash: "elPoeta-hash",
-    data: ["blockchain", "ethereum"],
+    previusHash: "elPoeta-previusHash",
+    hash: "d1c5b57036b1ced3fa7a4394edfd53e3642ef255c0049757a2ab2a9f4453629c",
+    data: "blockchain",
     nonce: 1,
     difficulty: 1,
   };
   const block = new Block(blockProps);
   it("has a timestamp, lastHash, hash and data property", () => {
     expect(block.timestamp).toEqual(blockProps.timestamp);
-    expect(block.lastHash).toEqual(blockProps.lastHash);
+    expect(block.previusHash).toEqual(blockProps.previusHash);
     expect(block.hash).toEqual(blockProps.hash);
     expect(block.data).toEqual(blockProps.data);
     expect(block.nonce).toEqual(blockProps.nonce);
@@ -30,7 +30,7 @@ describe("Block", () => {
 
     it("returns the genesis data", () => {
       expect(genesisBlock.hash).toEqual(GENESIS_DATA.hash);
-      expect(genesisBlock.lastHash).toEqual(GENESIS_DATA.lastHash);
+      expect(genesisBlock.previusHash).toEqual(GENESIS_DATA.previusHash);
       expect(genesisBlock.timestamp).toEqual(GENESIS_DATA.timestamp);
       expect(genesisBlock.data).toEqual(GENESIS_DATA.data);
     });
@@ -38,7 +38,7 @@ describe("Block", () => {
 
   describe("mine", () => {
     const lastBlock = Block.genesis();
-    const data = ["mined-block"];
+    const data = "mined-block";
     const minedBlock = Block.mine({ lastBlock, data });
 
     it("returns a block instance", () => {
@@ -46,7 +46,7 @@ describe("Block", () => {
     });
 
     it("set the `lastHash to be the hash of the lastBlock`", () => {
-      expect(minedBlock.lastHash).toEqual(lastBlock.hash);
+      expect(minedBlock.previusHash).toEqual(lastBlock.hash);
     });
 
     it("set data", () => {
@@ -63,8 +63,8 @@ describe("Block", () => {
           minedBlock.nonce,
           minedBlock.difficulty,
           minedBlock.timestamp,
-          minedBlock.lastHash,
-          ...data
+          minedBlock.previusHash,
+          data
         )
       );
     });

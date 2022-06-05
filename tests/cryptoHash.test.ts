@@ -2,8 +2,8 @@ import cryptoHash from "../src/utils/cryptoHash";
 
 describe("cyptoHash", () => {
   it("generates a SHA-256 hashed output", () => {
-    expect(cryptoHash("foobar")).toEqual(
-      "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"
+    expect(cryptoHash("elpoeta")).toEqual(
+      "a3fde1cea7e0bb560f1ab779c3861f647f8c303f8868118af43c33d007586a42"
     );
   });
 

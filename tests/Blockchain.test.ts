@@ -5,7 +5,7 @@ import cryptoHash from "../src/utils/cryptoHash";
 describe("Blockchain", () => {
   let blockchain: Blockchain;
   let newChain: Blockchain;
-  let originalChain: Array<Block>;
+  let originalChain: Block[];
 
   beforeEach(() => {
     blockchain = new Blockchain();
@@ -22,7 +22,7 @@ describe("Blockchain", () => {
   });
 
   it("add new block to the chain", () => {
-    const newData = ["first chain"];
+    const newData = "first chain";
     blockchain.addBlock(newData);
     expect(blockchain.chain[blockchain.chain.length - 1].data).toEqual(newData);
   });
@@ -30,27 +30,27 @@ describe("Blockchain", () => {
   describe("isValidChain", () => {
     describe("when chain does no starts with genesis block", () => {
       it("return false", () => {
-        blockchain.chain[0].data = ["fake-data"];
+        blockchain.chain[0].data = "fake-data";
         expect(Blockchain.isValidChain(blockchain.chain)).toBe(false);
       });
     });
 
     describe("when chain starts with genesis block and has multiple blocks", () => {
       beforeEach(() => {
-        blockchain.addBlock(["Web3"]);
-        blockchain.addBlock(["Ethereum"]);
-        blockchain.addBlock(["Solidity"]);
+        blockchain.addBlock("Web3");
+        blockchain.addBlock("Ethereum");
+        blockchain.addBlock("Solidity");
       });
       describe("and a lastHash reference has changed", () => {
         it("return false", () => {
-          blockchain.chain[2].lastHash = "broken-hash";
+          blockchain.chain[2].previusHash = "broken-hash";
           expect(Blockchain.isValidChain(blockchain.chain)).toBe(false);
         });
       });
 
       describe("and chain contain a block with inalid field", () => {
         it("return false", () => {
-          blockchain.chain[2].data = ["broken-data"];
+          blockchain.chain[2].data = "broken-data";
           expect(Blockchain.isValidChain(blockchain.chain)).toBe(false);
         });
       });
@@ -58,23 +58,23 @@ describe("Blockchain", () => {
       describe("and the chain contains a block with a jumped difficulty", () => {
         it("returns false", () => {
           const lastBlock = blockchain.chain[blockchain.chain.length - 1];
-          const lastHash = lastBlock.hash;
+          const previusHash = lastBlock.hash;
           const timestamp = Date.now();
           const nonce = 0;
-          const data: any[] = [];
+          const data: unknown = "";
           const difficulty = lastBlock.difficulty - 3;
           const hash = cryptoHash(
             timestamp,
-            lastHash,
+            previusHash,
             difficulty,
             nonce,
-            ...data
+            data
           );
           const badBlock = new Block({
             nonce,
             difficulty,
             timestamp,
-            lastHash,
+            previusHash,
             hash,
             data,
           });
@@ -104,7 +104,7 @@ describe("Blockchain", () => {
     });
     describe("when the new chain is not longer", () => {
       beforeEach(() => {
-        newChain.chain[0].data = ["chain"];
+        newChain.chain[0].data = "chain";
         blockchain.replaceChain(newChain.chain);
       });
       it("does not replace the chain", () => {
@@ -118,9 +118,9 @@ describe("Blockchain", () => {
 
     describe("when the new chain is longer", () => {
       beforeEach(() => {
-        newChain.addBlock(["Web3"]);
-        newChain.addBlock(["Ethereum"]);
-        newChain.addBlock(["Solidity"]);
+        newChain.addBlock("Web3");
+        newChain.addBlock("Ethereum");
+        newChain.addBlock("Solidity");
       });
       describe("and the chain is invalid", () => {
         beforeEach(() => {
