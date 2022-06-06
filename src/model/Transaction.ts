@@ -43,6 +43,14 @@ export class Transaction {
     return outputMap;
   }
 
+  update(transactionProps: ITransactionProps) {
+    const { senderWallet, recipient, amount } = transactionProps;
+    this.outputMap[recipient] = amount;
+    this.outputMap[senderWallet.publicKey] =
+      this.outputMap[senderWallet.publicKey] - amount;
+    this.input = this.createInput({ senderWallet, outputMap: this.outputMap });
+  }
+
   static isValid(transaction: Transaction): boolean {
     const {
       outputMap,

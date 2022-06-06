@@ -1,6 +1,6 @@
 import { Transaction } from "../src/model/Transaction";
 import { Wallet } from "../src/model/Wallet";
-import { verifySignature } from "../src/utils/cryptoSign";
+import { SignatureType, verifySignature } from "../src/utils/cryptoSign";
 
 describe("Transction", () => {
   let transaction: Transaction;
@@ -83,6 +83,46 @@ describe("Transction", () => {
           expect(Transaction.isValid(transaction)).toBe(false);
         });
       });
+    });
+  });
+
+  describe("update", () => {
+    let originalSignature: SignatureType;
+    let originalSenderOutput: number;
+    let nextAmount: number;
+    let nextRecipient: string;
+    beforeEach(() => {
+      originalSignature = transaction.input.signature;
+      originalSenderOutput = transaction.outputMap[sender.publicKey];
+      nextRecipient = new Wallet().publicKey;
+      nextAmount = 10;
+      transaction.update({
+        senderWallet: sender,
+        recipient: nextRecipient,
+        amount: nextAmount,
+      });
+    });
+
+    it("outputs the amount to the next recipient", () => {
+      expect(transaction.outputMap[nextRecipient]).toEqual(nextAmount);
+    });
+
+    it("subtract the amount from the original sender output amount", () => {
+      expect(transaction.outputMap[sender.publicKey]).toEqual(
+        originalSenderOutput - nextAmount
+      );
+    });
+
+    it("maintains a total output tha matches the input amount", () => {
+      expect(
+        Object.values(transaction.outputMap).reduce(
+          (total, amount) => total + amount
+        )
+      ).toEqual(transaction.input.amount);
+    });
+
+    it("re-signs the transaction", () => {
+      expect(transaction.input.signature).not.toBe(originalSignature);
     });
   });
 });
