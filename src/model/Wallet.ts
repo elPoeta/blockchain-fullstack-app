@@ -1,16 +1,18 @@
 import { STARTING_BALANCE } from "../config/config";
-import { ec } from "../utils/keyHash";
+import cryptoHash from "../utils/cryptoHash";
+import { ec, ecType, signatureType } from "../utils/cryptoSign";
 
 export class Wallet {
   public balance: number;
   public publicKey: string;
-
+  public keyPair: ecType;
   constructor() {
     this.balance = STARTING_BALANCE;
-    this.publicKey = this.getKeyPair();
+    this.keyPair = ec.genKeyPair();
+    this.publicKey = this.keyPair.getPublic().encode("hex", false);
   }
 
-  getKeyPair(): string {
-    return ec.genKeyPair().getPublic().encode("hex", false);
+  sign(data: unknown): signatureType {
+    return this.keyPair.sign(cryptoHash(data), "hex");
   }
 }

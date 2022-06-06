@@ -1,4 +1,5 @@
 import { Wallet } from "../src/model/Wallet";
+import { verifySignature } from "../src/utils/cryptoSign";
 
 describe("Wallet", () => {
   let wallet: Wallet;
@@ -14,5 +15,27 @@ describe("Wallet", () => {
     expect(wallet).toHaveProperty("publicKey");
   });
 
-  it("", () => {});
+  describe("signing data", () => {
+    const data = "elpoeta";
+
+    it("verifies signature", () => {
+      expect(
+        verifySignature({
+          publicKey: wallet.publicKey,
+          data,
+          signature: wallet.sign(data),
+        })
+      ).toBe(true);
+    });
+
+    it("does not verify invalid signature", () => {
+      expect(
+        verifySignature({
+          publicKey: wallet.publicKey,
+          data,
+          signature: new Wallet().sign(data),
+        })
+      ).toBe(false);
+    });
+  });
 });
