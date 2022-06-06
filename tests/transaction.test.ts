@@ -11,7 +11,6 @@ describe("Transction", () => {
     sender = new Wallet();
     recipient = "recipient_public_key";
     amount = 10;
-
     transaction = new Transaction({ senderWallet: sender, recipient, amount });
   });
 
@@ -60,6 +59,30 @@ describe("Transction", () => {
           signature: transaction.input.signature,
         })
       ).toBe(true);
+    });
+  });
+
+  describe("validTransaction()", () => {
+    describe("when the transaction is valid", () => {
+      it("returns true", () => {
+        expect(Transaction.isValid(transaction)).toBe(true);
+      });
+    });
+
+    describe("when the transaction is invalid", () => {
+      describe("and a transaction outputMap value is invalid", () => {
+        it("returns false and logs an error", () => {
+          transaction.outputMap[sender.publicKey] = 999999;
+          expect(Transaction.isValid(transaction)).toBe(false);
+        });
+      });
+
+      describe("and the transaction input signature is invalid", () => {
+        it("returns false and logs an error", () => {
+          transaction.input.signature = new Wallet().sign("fake-data");
+          expect(Transaction.isValid(transaction)).toBe(false);
+        });
+      });
     });
   });
 });

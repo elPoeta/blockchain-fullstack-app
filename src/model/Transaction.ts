@@ -4,6 +4,7 @@ import {
   OutputMapType,
   InputTxType,
 } from "../interfaces/ITransaction";
+import { verifySignature } from "../utils/cryptoSign";
 import { Wallet } from "./Wallet";
 
 type InputPropsType = {
@@ -40,5 +41,19 @@ export class Transaction {
     outputMap[recipient] = amount;
     outputMap[senderWallet.publicKey] = senderWallet.balance - amount;
     return outputMap;
+  }
+
+  static isValid(transaction: Transaction): boolean {
+    const {
+      outputMap,
+      input: { address, amount, signature },
+    } = transaction;
+    const outputTotal = Object.values(outputMap).reduce(
+      (total, outputAmount) => total + outputAmount
+    );
+    if (amount !== outputTotal) return false;
+    if (!verifySignature({ publicKey: address, data: outputMap, signature }))
+      return false;
+    return true;
   }
 }
