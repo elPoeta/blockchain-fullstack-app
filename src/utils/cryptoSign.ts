@@ -1,8 +1,8 @@
 import { ec as Ec } from "elliptic";
 import cryptoHash from "./cryptoHash";
 
-export type ecType = Ec.KeyPair;
-export type signatureType = Ec.Signature;
+export type EcType = Ec.KeyPair;
+export type SignatureType = Ec.Signature;
 
 export const ec = new Ec("secp256k1");
 
@@ -12,8 +12,8 @@ export const verifySignature = ({
   signature,
 }: {
   publicKey: string;
-  data: string;
-  signature: signatureType;
+  data: unknown;
+  signature: SignatureType;
 }): boolean => {
   const keyFromPublic = ec.keyFromPublic(publicKey, "hex");
   return keyFromPublic.verify(cryptoHash(data), signature);

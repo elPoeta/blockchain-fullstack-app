@@ -1,5 +1,6 @@
 import { Transaction } from "../src/model/Transaction";
 import { Wallet } from "../src/model/Wallet";
+import { verifySignature } from "../src/utils/cryptoSign";
 
 describe("Transction", () => {
   let transaction: Transaction;
@@ -31,6 +32,34 @@ describe("Transction", () => {
       expect(transaction.outputMap[sender.publicKey]).toEqual(
         sender.balance - amount
       );
+    });
+  });
+
+  describe("input", () => {
+    it("has an input", () => {
+      expect(transaction).toHaveProperty("input");
+    });
+
+    it("has timestamp", () => {
+      expect(transaction.input).toHaveProperty("timestamp");
+    });
+
+    it("set the mount to sender wallet balance", () => {
+      expect(transaction.input.amount).toEqual(sender.balance);
+    });
+
+    it("set thea addres to sender wallet of public key", () => {
+      expect(transaction.input.address).toEqual(sender.publicKey);
+    });
+
+    it("sign input", () => {
+      expect(
+        verifySignature({
+          publicKey: sender.publicKey,
+          data: transaction.outputMap,
+          signature: transaction.input.signature,
+        })
+      ).toBe(true);
     });
   });
 });

@@ -1,4 +1,5 @@
 import { Wallet } from "../model/Wallet";
+import { SignatureType } from "../utils/cryptoSign";
 
 export interface ITransactionProps {
   senderWallet: Wallet;
@@ -6,4 +7,11 @@ export interface ITransactionProps {
   amount: number;
 }
 
-export type outputMapType = Record<string, number>;
+export type OutputMapType = Record<string, number>;
+
+export type InputTxType = {
+  timestamp: number;
+  address: string;
+  amount: number;
+  signature: SignatureType;
+};

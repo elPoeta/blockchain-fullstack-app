@@ -1,17 +1,41 @@
-import { uuid } from "uuidv4";
-import { ITransactionProps, outputMapType } from "../interfaces/ITransaction";
+import { v4 } from "uuid";
+import {
+  ITransactionProps,
+  OutputMapType,
+  InputTxType,
+} from "../interfaces/ITransaction";
+import { Wallet } from "./Wallet";
 
+type InputPropsType = {
+  senderWallet: Wallet;
+  outputMap: OutputMapType;
+};
 export class Transaction {
   public id: string;
-  public outputMap: outputMapType;
+  public outputMap: OutputMapType;
+  public input: InputTxType;
 
   constructor(transactionProps: ITransactionProps) {
-    this.id = uuid();
+    this.id = v4();
     this.outputMap = this.createOutpuMap(transactionProps);
+    this.input = this.createInput({
+      senderWallet: transactionProps.senderWallet,
+      outputMap: this.outputMap,
+    });
+  }
+
+  createInput(inputProps: InputPropsType): InputTxType {
+    const { senderWallet, outputMap } = inputProps;
+    return {
+      timestamp: Date.now(),
+      amount: senderWallet.balance,
+      address: senderWallet.publicKey,
+      signature: senderWallet.sign(outputMap),
+    };
   }
 
   createOutpuMap(transactionProps: ITransactionProps) {
-    const outputMap: outputMapType = {};
+    const outputMap: OutputMapType = {};
     const { senderWallet, recipient, amount } = transactionProps;
     outputMap[recipient] = amount;
     outputMap[senderWallet.publicKey] = senderWallet.balance - amount;
