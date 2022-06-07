@@ -31,9 +31,15 @@ app.post("/api/v1/mine", (req: Request, res: Response) => {
 
 app.post("api/v1/transaction", (req: Request, res: Response) => {
   const { recipient, amount } = req.body;
-  let transaction;
+  let transaction = transactionPool.existingTransaction({
+    inputAddress: wallet.publicKey,
+  });
   try {
-    transaction = wallet.createTransaction({ amount, recipient });
+    if (!transaction) {
+      transaction = wallet.createTransaction({ amount, recipient });
+    } else {
+      transaction.update({ senderWallet: wallet, amount, recipient });
+    }
   } catch (error) {
     let message = "Unknown Error";
     if (error instanceof Error) message = error.message;

@@ -5,13 +5,13 @@ import { Wallet } from "../src/model/Wallet";
 describe("TransactionPool", () => {
   let transactionPool: TransactionPool;
   let transaction: Transaction;
-  let wallet: Wallet;
+  let sender: Wallet;
 
   beforeEach(() => {
-    wallet = new Wallet();
+    sender = new Wallet();
     transactionPool = new TransactionPool();
     transaction = new Transaction({
-      senderWallet: wallet,
+      senderWallet: sender,
       recipient: new Wallet().publicKey,
       amount: 10,
     });
@@ -20,6 +20,14 @@ describe("TransactionPool", () => {
     it("adds a transaction", () => {
       transactionPool.setTransaction(transaction);
       expect(transactionPool.transactionMap[transaction.id]).toBe(transaction);
+    });
+  });
+  describe("existingTransaction()", () => {
+    it("returns an existing transaction given an input address", () => {
+      transactionPool.setTransaction(transaction);
+      expect(
+        transactionPool.existingTransaction({ inputAddress: sender.publicKey })
+      ).toBe(transaction);
     });
   });
 });
