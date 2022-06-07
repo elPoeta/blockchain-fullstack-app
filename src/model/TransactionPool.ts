@@ -1,9 +1,9 @@
 import { Transaction } from "./Transaction";
 
-type transactionMapType = Record<string, Transaction>;
+type TransactionMapType = Record<string, Transaction>;
 
 export class TransactionPool {
-  public transactionMap: transactionMapType;
+  public transactionMap: TransactionMapType;
   constructor() {
     this.transactionMap = {};
   }
@@ -21,5 +21,9 @@ export class TransactionPool {
     return transactions.find(
       (transaction) => transaction.input.address === inputAddress
     );
+  }
+
+  setMap(transactionMap: TransactionMapType) {
+    this.transactionMap = transactionMap;
   }
 }

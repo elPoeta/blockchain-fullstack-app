@@ -5,6 +5,7 @@ import { Block } from "./model/Block";
 import { TransactionPool } from "./model/TransactionPool";
 import { Wallet } from "./model/Wallet";
 import { PubSub } from "./model/PubSub";
+import { Transaction } from "./model/Transaction";
 
 const app = express();
 
@@ -29,7 +30,7 @@ app.post("/api/v1/mine", (req: Request, res: Response) => {
   res.redirect("/api/v1/blocks");
 });
 
-app.post("api/v1/transaction", (req: Request, res: Response) => {
+app.post("/api/v1/transaction", (req: Request, res: Response) => {
   const { recipient, amount } = req.body;
   let transaction = transactionPool.existingTransaction({
     inputAddress: wallet.publicKey,
@@ -50,11 +51,17 @@ app.post("api/v1/transaction", (req: Request, res: Response) => {
   res.status(201).json({ transaction });
 });
 
-app.get("api/v1/transaction-pool", (req: Request, res: Response) => {
-  res
-    .status(200)
-    .json({ transactionPool: transactionPool.transactionMap, success: true });
+app.get("/api/v1/transaction-pool", (req: Request, res: Response) => {
+  res.status(200).json({
+    transactionPoolMap: transactionPool.transactionMap,
+    success: true,
+  });
 });
+
+const syncBlockchainState = () => {
+  syncChains();
+  syncTransactions();
+};
 
 const syncChains = async () => {
   try {
@@ -62,6 +69,24 @@ const syncChains = async () => {
     const { blocks }: { blocks: Block[] } = data;
     console.log(blocks);
     blockchain.replaceChain(blocks);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.log("Axios error", error);
+    } else {
+      console.log("unexpeted error", error);
+    }
+  }
+};
+
+const syncTransactions = async () => {
+  try {
+    const { data } = await axios.get(
+      `${DEFAULT_ADDRESS}/api/v1/transaction-pool`
+    );
+    const {
+      transactionPoolMap,
+    }: { transactionPoolMap: Record<string, Transaction> } = data;
+    transactionPool.setMap(transactionPoolMap);
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.log("Axios error", error);
@@ -81,5 +106,7 @@ const PORT = process.env.PORT || PEER_PORT! || DEFAULT_PORT;
 
 app.listen(PORT, () => {
   console.log(`Server ran in port: ${PORT}`);
-  if (PORT !== DEFAULT_PORT) syncChains();
+  if (PORT !== DEFAULT_PORT) {
+    syncBlockchainState();
+  }
 });
