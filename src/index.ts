@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/api/v1/blocks", (req: Request, res: Response) => {
-  res.status(200).json({ blocks: blockchain.chain });
+  res.status(200).json({ blocks: blockchain.chain, success: true });
 });
 
 app.post("/api/v1/mine", (req: Request, res: Response) => {
@@ -31,7 +31,14 @@ app.post("/api/v1/mine", (req: Request, res: Response) => {
 
 app.post("api/v1/transaction", (req: Request, res: Response) => {
   const { recipient, amount } = req.body;
-  const transaction = wallet.createTransaction({ amount, recipient });
+  let transaction;
+  try {
+    transaction = wallet.createTransaction({ amount, recipient });
+  } catch (error) {
+    let message = "Unknown Error";
+    if (error instanceof Error) message = error.message;
+    return res.status(400).json({ success: false, message });
+  }
   transactionPool.setTransaction(transaction);
   console.log("TX #", transaction);
   res.status(201).json({ transaction });
