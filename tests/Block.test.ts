@@ -5,7 +5,7 @@ import { hexToBinary } from "../src/utils/hexToBinary";
 
 describe("Block", () => {
   const blockProps = {
-    timestamp: 2000,
+    timestamp: 1654446893737,
     previusHash: "none",
     hash: "0000000000000000000000000000000000000000000000000000000000000000",
     data: "blockchain",
