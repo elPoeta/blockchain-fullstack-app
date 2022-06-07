@@ -13,7 +13,7 @@ const DEFAULT_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
 const blockchain = new Blockchain();
 const transactionPool = new TransactionPool();
 const wallet = new Wallet();
-const pubSub = new PubSub({ blockchain });
+const pubSub = new PubSub({ blockchain, transactionPool });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -46,6 +46,7 @@ app.post("api/v1/transaction", (req: Request, res: Response) => {
     return res.status(400).json({ success: false, message });
   }
   transactionPool.setTransaction(transaction);
+  pubSub.broadcastTransaction(transaction);
   res.status(201).json({ transaction });
 });
 
