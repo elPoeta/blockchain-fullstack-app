@@ -54,6 +54,7 @@ app.get("api/v1/transaction-pool", (req: Request, res: Response) => {
     .status(200)
     .json({ transactionPool: transactionPool.transactionMap, success: true });
 });
+
 const syncChains = async () => {
   try {
     const { data } = await axios.get(`${DEFAULT_ADDRESS}/api/v1/blocks`);
