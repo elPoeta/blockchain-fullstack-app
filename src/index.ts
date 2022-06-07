@@ -1,7 +1,9 @@
 import express, { Response, Request } from "express";
-import axios from 'axios';
+import axios from "axios";
 import { Blockchain } from "./model/Blockchain";
 import { Block } from "./model/Block";
+import { TransactionPool } from "./model/TransactionPool";
+import { Wallet } from "./model/Wallet";
 import { PubSub } from "./model/PubSub";
 
 const app = express();
@@ -9,6 +11,8 @@ const app = express();
 const DEFAULT_PORT = 4000;
 const DEFAULT_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
 const blockchain = new Blockchain();
+const transactionPool = new TransactionPool();
+const wallet = new Wallet();
 const pubSub = new PubSub({ blockchain });
 
 app.use(express.json());
@@ -25,26 +29,32 @@ app.post("/api/v1/mine", (req: Request, res: Response) => {
   res.redirect("/api/v1/blocks");
 });
 
+app.post("api/v1/transaction", (req: Request, res: Response) => {
+  const { recipient, amount } = req.body;
+  const transaction = wallet.createTransaction({ amount, recipient });
+  transactionPool.setTransaction(transaction);
+  console.log("TX #", transaction);
+  res.status(201).json({ transaction });
+});
 
 const syncChains = async () => {
   try {
     const { data } = await axios.get(`${DEFAULT_ADDRESS}/api/v1/blocks`);
     const { blocks }: { blocks: Block[] } = data;
-    console.log(blocks)
+    console.log(blocks);
     blockchain.replaceChain(blocks);
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.log('Axios error', error)
+      console.log("Axios error", error);
     } else {
-      console.log('unexpeted error', error)
-
+      console.log("unexpeted error", error);
     }
   }
-}
+};
 
 let PEER_PORT: number;
 
-if (process.env.GENERATE_PEER_PORT === 'true') {
+if (process.env.GENERATE_PEER_PORT === "true") {
   PEER_PORT = DEFAULT_PORT + Math.ceil(Math.random() * 1000);
 }
 
@@ -52,6 +62,5 @@ const PORT = process.env.PORT || PEER_PORT! || DEFAULT_PORT;
 
 app.listen(PORT, () => {
   console.log(`Server ran in port: ${PORT}`);
-  if (PORT !== DEFAULT_PORT)
-    syncChains();
+  if (PORT !== DEFAULT_PORT) syncChains();
 });
