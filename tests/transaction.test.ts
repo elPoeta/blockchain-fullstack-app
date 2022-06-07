@@ -122,7 +122,7 @@ describe("Transction", () => {
     });
 
     it("re-signs the transaction", () => {
-      expect(transaction.input.signature).not.toBe(originalSignature);
+      expect(transaction.input.signature).not.toEqual(originalSignature);
     });
   });
 });
