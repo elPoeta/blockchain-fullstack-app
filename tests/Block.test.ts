@@ -6,8 +6,8 @@ import { hexToBinary } from "../src/utils/hexToBinary";
 describe("Block", () => {
   const blockProps = {
     timestamp: 2000,
-    previusHash: "elPoeta-previusHash",
-    hash: "d1c5b57036b1ced3fa7a4394edfd53e3642ef255c0049757a2ab2a9f4453629c",
+    previusHash: "none",
+    hash: "0000000000000000000000000000000000000000000000000000000000000000",
     data: "blockchain",
     nonce: 1,
     difficulty: 1,
