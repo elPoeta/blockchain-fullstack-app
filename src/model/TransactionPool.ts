@@ -1,3 +1,4 @@
+import { Block } from "./Block";
 import { Transaction } from "./Transaction";
 
 type TransactionMapType = Record<string, Transaction>;
@@ -32,5 +33,19 @@ export class TransactionPool {
     return Object.values(this.transactionMap).filter((transaction) =>
       Transaction.isValid(transaction)
     );
+  }
+
+  clear() {
+    this.transactionMap = {};
+  }
+
+  clearBlockchainTransactions({ chain }: { chain: Block[] }) {
+    for (let i = 0; i < chain.length; i++) {
+      const transactions: Transaction[] = chain[i].data as Transaction[];
+      for (let transaction of transactions) {
+        if (this.transactionMap[transaction.id])
+          delete this.transactionMap[transaction.id];
+      }
+    }
   }
 }

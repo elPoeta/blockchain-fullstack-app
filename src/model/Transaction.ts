@@ -1,8 +1,10 @@
 import { v4 } from "uuid";
+import { MINING_REWARD, REWARD_INPUT } from "../config/config";
 import {
   ITransactionProps,
   OutputMapType,
   InputTxType,
+  RewardTransactionType,
 } from "../interfaces/ITransaction";
 import { verifySignature } from "../utils/cryptoSign";
 import { Wallet } from "./Wallet";
@@ -66,8 +68,26 @@ export class Transaction {
       (total, outputAmount) => total + outputAmount
     );
     if (amount !== outputTotal) return false;
-    if (!verifySignature({ publicKey: address, data: outputMap, signature }))
+    if (
+      !verifySignature({
+        publicKey: address,
+        data: outputMap,
+        signature,
+      })
+    )
       return false;
     return true;
+  }
+
+  static rewardTransaction({
+    minerWallet,
+  }: {
+    minerWallet: Wallet;
+  }): RewardTransactionType {
+    return {
+      id: v4(),
+      input: REWARD_INPUT,
+      outputMap: { [minerWallet.publicKey]: MINING_REWARD },
+    };
   }
 }

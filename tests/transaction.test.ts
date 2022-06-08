@@ -1,3 +1,5 @@
+import { MINING_REWARD, REWARD_INPUT } from "../src/config/config";
+import { RewardTransactionType } from "../src/interfaces/ITransaction";
 import { Transaction } from "../src/model/Transaction";
 import { Wallet } from "../src/model/Wallet";
 import { SignatureType, verifySignature } from "../src/utils/cryptoSign";
@@ -163,6 +165,25 @@ describe("Transction", () => {
           );
         });
       });
+    });
+  });
+
+  describe("reward transaction", () => {
+    let rewardTransaction: RewardTransactionType;
+    let minerWallet: Wallet;
+    beforeEach(() => {
+      minerWallet = new Wallet();
+      rewardTransaction = Transaction.rewardTransaction({ minerWallet });
+    });
+
+    it("create a tx with reward input", () => {
+      expect(rewardTransaction.input).toEqual(REWARD_INPUT);
+    });
+
+    it("one tx for the miner with the mining_rewward", () => {
+      expect(rewardTransaction.outputMap[minerWallet.publicKey]).toEqual(
+        MINING_REWARD
+      );
     });
   });
 });
