@@ -13,8 +13,8 @@ export const verifySignature = ({
 }: {
   publicKey: string;
   data: unknown;
-  signature: SignatureType;
+  signature: SignatureType | undefined;
 }): boolean => {
   const keyFromPublic = ec.keyFromPublic(publicKey, "hex");
-  return keyFromPublic.verify(cryptoHash(data), signature);
+  return keyFromPublic.verify(cryptoHash(data), signature!);
 };

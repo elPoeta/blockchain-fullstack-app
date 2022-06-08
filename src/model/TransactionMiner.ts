@@ -1,4 +1,5 @@
 import { ITransactionMinerProps } from "../interfaces/ITransactionMiner";
+import { Transaction } from "./Transaction";
 
 export class TransactionMiner {
   public blockchain;

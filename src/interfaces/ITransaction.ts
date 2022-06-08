@@ -2,9 +2,11 @@ import { Wallet } from "../model/Wallet";
 import { SignatureType } from "../utils/cryptoSign";
 
 export interface ITransactionProps {
-  senderWallet: Wallet;
-  recipient: string;
-  amount: number;
+  senderWallet?: Wallet;
+  recipient?: string;
+  amount?: number;
+  input?: InputTxType;
+  outputMap?: OutputMapType;
 }
 
 export type OutputMapType = Record<string, number>;
@@ -12,17 +14,6 @@ export type OutputMapType = Record<string, number>;
 export type InputTxType = {
   timestamp: number;
   address: string;
-  amount: number;
-  signature: SignatureType;
+  amount?: number;
+  signature?: SignatureType;
 };
-
-type RewardInputType = {
-  input: { address: string };
-};
-
-type RewardOutputType = {
-  outputMap: { [key: string]: number };
-};
-
-export type RewardTransactionType = { id: string } & RewardInputType &
-  RewardOutputType;

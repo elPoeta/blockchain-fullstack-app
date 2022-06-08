@@ -1,5 +1,4 @@
 import { MINING_REWARD, REWARD_INPUT } from "../src/config/config";
-import { RewardTransactionType } from "../src/interfaces/ITransaction";
 import { Transaction } from "../src/model/Transaction";
 import { Wallet } from "../src/model/Wallet";
 import { SignatureType, verifySignature } from "../src/utils/cryptoSign";
@@ -58,7 +57,7 @@ describe("Transction", () => {
         verifySignature({
           publicKey: sender.publicKey,
           data: transaction.outputMap,
-          signature: transaction.input.signature,
+          signature: transaction.input!.signature,
         })
       ).toBe(true);
     });
@@ -89,7 +88,7 @@ describe("Transction", () => {
   });
 
   describe("update", () => {
-    let originalSignature: SignatureType;
+    let originalSignature: SignatureType | undefined;
     let originalSenderOutput: number;
     let nextAmount: number;
     let nextRecipient: string;
@@ -108,7 +107,7 @@ describe("Transction", () => {
 
     describe("and the amount is valid", () => {
       beforeEach(() => {
-        originalSignature = transaction.input.signature;
+        originalSignature = transaction.input!.signature;
         originalSenderOutput = transaction.outputMap[sender.publicKey];
         nextRecipient = new Wallet().publicKey;
         nextAmount = 10;
@@ -169,7 +168,7 @@ describe("Transction", () => {
   });
 
   describe("reward transaction", () => {
-    let rewardTransaction: RewardTransactionType;
+    let rewardTransaction: Transaction;
     let minerWallet: Wallet;
     beforeEach(() => {
       minerWallet = new Wallet();
@@ -177,7 +176,7 @@ describe("Transction", () => {
     });
 
     it("create a tx with reward input", () => {
-      expect(rewardTransaction.input).toEqual(REWARD_INPUT);
+      expect(rewardTransaction.input.address).toEqual(REWARD_INPUT.address);
     });
 
     it("one tx for the miner with the mining_rewward", () => {
