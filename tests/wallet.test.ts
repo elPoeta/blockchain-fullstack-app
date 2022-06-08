@@ -1,6 +1,8 @@
 import { Transaction } from "../src/model/Transaction";
 import { Wallet } from "../src/model/Wallet";
+import { Blockchain } from "../src/model/Blockchain";
 import { verifySignature } from "../src/utils/cryptoSign";
+import { STARTING_BALANCE } from "../src/config/config";
 
 describe("Wallet", () => {
   let wallet: Wallet;
@@ -71,6 +73,53 @@ describe("Wallet", () => {
 
       it("output the amount of recipient", () => {
         expect(transaction.outputMap[recipient]).toEqual(amount);
+      });
+    });
+  });
+
+  describe("calculate balance", () => {
+    let blockchain: Blockchain;
+    beforeEach(() => {
+      blockchain = new Blockchain();
+    });
+    describe("there are no outputs for the wallet", () => {
+      it("return starting balance", () => {
+        expect(
+          Wallet.calculateBalance({
+            chain: blockchain.chain,
+            address: wallet.publicKey,
+          })
+        ).toEqual(STARTING_BALANCE);
+      });
+    });
+
+    describe("there are outputs for the wallet", () => {
+      let transactionOne: Transaction;
+      let transactionTwo: Transaction;
+
+      beforeEach(() => {
+        transactionOne = new Wallet().createTransaction({
+          recipient: wallet.publicKey,
+          amount: 50,
+        });
+        transactionTwo = new Wallet().createTransaction({
+          recipient: wallet.publicKey,
+          amount: 60,
+        });
+        blockchain.addBlock([transactionOne, transactionTwo]);
+      });
+
+      it("adds the sum of all outputs to the wallet balance", () => {
+        expect(
+          Wallet.calculateBalance({
+            chain: blockchain.chain,
+            address: wallet.publicKey,
+          })
+        ).toEqual(
+          STARTING_BALANCE +
+            transactionOne.outputMap[wallet.publicKey] +
+            transactionTwo.outputMap[wallet.publicKey]
+        );
       });
     });
   });
