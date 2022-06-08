@@ -4,6 +4,7 @@ type TransactionMapType = Record<string, Transaction>;
 
 export class TransactionPool {
   public transactionMap: TransactionMapType;
+
   constructor() {
     this.transactionMap = {};
   }
@@ -25,5 +26,11 @@ export class TransactionPool {
 
   setMap(transactionMap: TransactionMapType) {
     this.transactionMap = transactionMap;
+  }
+
+  validTransactions(): Transaction[] {
+    return Object.values(this.transactionMap).filter((transaction) =>
+      Transaction.isValid(transaction)
+    );
   }
 }

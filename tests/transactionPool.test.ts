@@ -30,4 +30,31 @@ describe("TransactionPool", () => {
       ).toBe(transaction);
     });
   });
+
+  describe("validTransactions", () => {
+    let validTransactions: Transaction[];
+    beforeEach(() => {
+      validTransactions = [];
+      const recipient = new Wallet().publicKey;
+      for (let i = 0; i < 10; i++) {
+        const transaction = new Transaction({
+          senderWallet: sender,
+          recipient,
+          amount: 5,
+        });
+        if (i % 3 === 0) {
+          transaction.input.amount = 9999;
+        } else if (i % 3 === 1) {
+          transaction.input.signature = new Wallet().sign("fake");
+        } else {
+          validTransactions.push(transaction);
+        }
+        transactionPool.setTransaction(transaction);
+      }
+    });
+
+    it("return valid transaction", () => {
+      expect(transactionPool.validTransactions()).toEqual(validTransactions);
+    });
+  });
 });
