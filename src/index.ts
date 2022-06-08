@@ -80,7 +80,7 @@ const syncChains = async () => {
     const { data } = await axios.get(`${DEFAULT_ADDRESS}/api/v1/blocks`);
     const { blocks }: { blocks: Block[] } = data;
     console.log(blocks);
-    blockchain.replaceChain(blocks);
+    blockchain.replaceChain(blocks, () => {});
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.log("Axios error", error);
