@@ -15,3 +15,14 @@ export type InputTxType = {
   amount: number;
   signature: SignatureType;
 };
+
+type RewardInputType = {
+  input: { address: string };
+};
+
+type RewardOutputType = {
+  outputMap: { [key: string]: number };
+};
+
+export type RewardTransactionType = { id: string } & RewardInputType &
+  RewardOutputType;
