@@ -11,13 +11,21 @@ export class TransactionMiner {
     blockchain,
     transactionPool,
     wallet,
-    pubsub,
+    pubSub,
   }: ITransactionMinerProps) {
     this.blockchain = blockchain;
     this.transactionPool = transactionPool;
     this.wallet = wallet;
-    this.pubSub = pubsub;
+    this.pubSub = pubSub;
   }
 
-  mineTransactions() {}
+  mineTransactions() {
+    const validTransactions = this.transactionPool.validTransactions();
+    validTransactions.push(
+      Transaction.rewardTransaction({ minerWallet: this.wallet })
+    );
+    this.blockchain.addBlock(validTransactions);
+    this.pubSub.broadcastChain();
+    this.transactionPool.clear();
+  }
 }

@@ -7,5 +7,5 @@ export interface ITransactionMinerProps {
   blockchain: Blockchain;
   transactionPool: TransactionPool;
   wallet: Wallet;
-  pubsub: PubSub;
+  pubSub: PubSub;
 }

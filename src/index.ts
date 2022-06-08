@@ -6,6 +6,7 @@ import { TransactionPool } from "./model/TransactionPool";
 import { Wallet } from "./model/Wallet";
 import { PubSub } from "./model/PubSub";
 import { Transaction } from "./model/Transaction";
+import { TransactionMiner } from "./model/TransactionMiner";
 
 const app = express();
 
@@ -15,6 +16,12 @@ const blockchain = new Blockchain();
 const transactionPool = new TransactionPool();
 const wallet = new Wallet();
 const pubSub = new PubSub({ blockchain, transactionPool });
+const transactionMiner = new TransactionMiner({
+  blockchain,
+  transactionPool,
+  wallet,
+  pubSub,
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -56,6 +63,11 @@ app.get("/api/v1/transaction-pool", (req: Request, res: Response) => {
     transactionPoolMap: transactionPool.transactionMap,
     success: true,
   });
+});
+
+app.get("/api/v1/mine-transactions", (req: Request, res: Response) => {
+  transactionMiner.mineTransactions();
+  res.redirect("/api/v1/blocks");
 });
 
 const syncBlockchainState = () => {
