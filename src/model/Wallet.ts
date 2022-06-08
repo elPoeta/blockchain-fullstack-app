@@ -7,6 +7,7 @@ import { Transaction } from "./Transaction";
 type CreateTxType = {
   amount: number;
   recipient: string;
+  chain?: Block[];
 };
 export class Wallet {
   public balance: number;
@@ -23,7 +24,13 @@ export class Wallet {
   }
 
   createTransaction(createTxProps: CreateTxType): Transaction {
-    const { amount, recipient } = createTxProps;
+    const { amount, recipient, chain } = createTxProps;
+    if (chain) {
+      this.balance = Wallet.calculateBalance({
+        address: this.publicKey,
+        chain,
+      });
+    }
     if (amount > this.balance) throw new Error("Amount exceeds balance");
     return new Transaction({ senderWallet: this, recipient, amount });
   }
