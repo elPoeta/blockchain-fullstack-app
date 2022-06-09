@@ -76,13 +76,11 @@ app.get("/api/v1/mine-transactions", (req: Request, res: Response) => {
 
 app.get("/api/v1/wallet", (req: Request, res: Response) => {
   const address = wallet.publicKey;
-  res
-    .status(200)
-    .json({
-      success: true,
-      address,
-      balance: Wallet.calculateBalance({ chain: blockchain.chain, address }),
-    });
+  res.status(200).json({
+    success: true,
+    address,
+    balance: Wallet.calculateBalance({ chain: blockchain.chain, address }),
+  });
 });
 const syncBlockchainState = () => {
   syncChains();
@@ -94,7 +92,7 @@ const syncChains = async () => {
     const { data } = await axios.get(`${DEFAULT_ADDRESS}/api/v1/blocks`);
     const { blocks }: { blocks: Block[] } = data;
     console.log(blocks);
-    blockchain.replaceChain(blocks, () => {});
+    blockchain.replaceChain(blocks, false);
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.log("Axios error", error);

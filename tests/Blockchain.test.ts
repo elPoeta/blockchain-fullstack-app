@@ -1,6 +1,8 @@
 import { Blockchain } from "../src/model/Blockchain";
 import { Block } from "../src/model/Block";
+import { Transaction } from "../src/model/Transaction";
 import cryptoHash from "../src/utils/cryptoHash";
+import { Wallet } from "../src/model/Wallet";
 
 describe("Blockchain", () => {
   let blockchain: Blockchain;
@@ -105,7 +107,7 @@ describe("Blockchain", () => {
     describe("when the new chain is not longer", () => {
       beforeEach(() => {
         newChain.chain[0].data = "chain";
-        blockchain.replaceChain(newChain.chain);
+        blockchain.replaceChain(newChain.chain, false);
       });
       it("does not replace the chain", () => {
         expect(blockchain.chain).toEqual(originalChain);
@@ -125,7 +127,7 @@ describe("Blockchain", () => {
       describe("and the chain is invalid", () => {
         beforeEach(() => {
           newChain.chain[2].hash = "fake-hash";
-          blockchain.replaceChain(newChain.chain);
+          blockchain.replaceChain(newChain.chain, false);
         });
         it("does not replace the chain", () => {
           expect(blockchain.chain).toEqual(originalChain);
@@ -138,7 +140,7 @@ describe("Blockchain", () => {
 
       describe("and the chain is valid", () => {
         beforeEach(() => {
-          blockchain.replaceChain(newChain.chain);
+          blockchain.replaceChain(newChain.chain, false);
         });
         it("replaces the chain", () => {
           expect(blockchain.chain).toEqual(newChain.chain);
@@ -146,6 +148,110 @@ describe("Blockchain", () => {
         it("logs about the chain replacement", () => {
           expect(logMock).toHaveBeenCalled();
         });
+      });
+    });
+
+    describe("and the `validateTransactions` flag is true", () => {
+      it("calls validTransactionData()", () => {
+        const validTransactionDataMock = jest.fn();
+        blockchain.validTransactionData = validTransactionDataMock;
+        newChain.addBlock("fake-data");
+        blockchain.replaceChain(newChain.chain, true);
+        expect(validTransactionDataMock).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe("valid transaction data", () => {
+    let transaction: Transaction;
+    let rewardTransaction: Transaction;
+    let wallet: Wallet;
+
+    beforeEach(() => {
+      wallet = new Wallet();
+      transaction = wallet.createTransaction({
+        recipient: new Wallet().publicKey,
+        amount: 70,
+      });
+      rewardTransaction = Transaction.rewardTransaction({
+        minerWallet: wallet,
+      });
+    });
+
+    describe("and the transaction data is valid", () => {
+      it("returns true", () => {
+        newChain.addBlock([transaction, rewardTransaction]);
+        expect(blockchain.validTransactionData({ chain: newChain.chain })).toBe(
+          true
+        );
+      });
+    });
+
+    describe("and the transaction data has multiple rewards", () => {
+      it("returns false", () => {
+        newChain.addBlock([transaction, rewardTransaction, rewardTransaction]);
+        expect(blockchain.validTransactionData({ chain: newChain.chain })).toBe(
+          false
+        );
+      });
+    });
+
+    describe("and the transaction data has at least one malformed outputMap", () => {
+      describe("and the transaction is not a reward transaction", () => {
+        it("returns false", () => {
+          transaction.outputMap[wallet.publicKey] = 999999;
+          newChain.addBlock([transaction, rewardTransaction]);
+          expect(
+            blockchain.validTransactionData({ chain: newChain.chain })
+          ).toBe(false);
+        });
+      });
+
+      describe("and the transaction is a reward transaction", () => {
+        it("returns false", () => {
+          rewardTransaction.outputMap[wallet.publicKey] = 999999;
+          newChain.addBlock([transaction, rewardTransaction]);
+          expect(
+            blockchain.validTransactionData({ chain: newChain.chain })
+          ).toBe(false);
+        });
+      });
+    });
+
+    describe("and the transaction data has at least one malformed input", () => {
+      it("returns false", () => {
+        wallet.balance = 9000;
+
+        const evilOutputMap = {
+          [wallet.publicKey]: 8900,
+          fooRecipient: 100,
+        };
+        const evilTransaction = {
+          input: {
+            timestamp: Date.now(),
+            amount: wallet.balance,
+            address: wallet.publicKey,
+            signature: wallet.sign(evilOutputMap),
+          },
+          outputMap: evilOutputMap,
+        };
+        newChain.addBlock([evilTransaction, rewardTransaction]);
+        expect(blockchain.validTransactionData({ chain: newChain.chain })).toBe(
+          false
+        );
+      });
+    });
+    describe("and a block contains multiple identical transactions", () => {
+      it("returns false", () => {
+        newChain.addBlock([
+          transaction,
+          transaction,
+          transaction,
+          rewardTransaction,
+        ]);
+        expect(blockchain.validTransactionData({ chain: newChain.chain })).toBe(
+          false
+        );
       });
     });
   });
