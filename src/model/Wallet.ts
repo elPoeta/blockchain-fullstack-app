@@ -42,14 +42,19 @@ export class Wallet {
     chain: Block[];
     address: string;
   }): number {
+    let hasConductedTransaction = false;
     let total = 0;
-    for (let i = 0; i < chain.length; i++) {
+    for (let i = chain.length - 1; i > 0; i--) {
       const transactions: Transaction[] = chain[i].data as Transaction[];
       for (let transaction of transactions) {
+        if (transaction.input.address === address) {
+          hasConductedTransaction = true;
+        }
         const addressOutputAmount = transaction.outputMap[address];
         if (addressOutputAmount) total += addressOutputAmount;
       }
+      if (hasConductedTransaction) break;
     }
-    return STARTING_BALANCE + total;
+    return hasConductedTransaction ? total : STARTING_BALANCE + total;
   }
 }

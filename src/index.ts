@@ -44,7 +44,11 @@ app.post("/api/v1/transaction", (req: Request, res: Response) => {
   });
   try {
     if (!transaction) {
-      transaction = wallet.createTransaction({ amount, recipient });
+      transaction = wallet.createTransaction({
+        amount,
+        recipient,
+        chain: blockchain.chain,
+      });
     } else {
       transaction.update({ senderWallet: wallet, amount, recipient });
     }
@@ -70,6 +74,16 @@ app.get("/api/v1/mine-transactions", (req: Request, res: Response) => {
   res.redirect("/api/v1/blocks");
 });
 
+app.get("/api/v1/wallet", (req: Request, res: Response) => {
+  const address = wallet.publicKey;
+  res
+    .status(200)
+    .json({
+      success: true,
+      address,
+      balance: Wallet.calculateBalance({ chain: blockchain.chain, address }),
+    });
+});
 const syncBlockchainState = () => {
   syncChains();
   syncTransactions();

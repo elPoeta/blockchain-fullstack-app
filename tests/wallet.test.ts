@@ -142,5 +142,64 @@ describe("Wallet", () => {
         );
       });
     });
+
+    describe("and the wallet has made a transaction", () => {
+      let recentTransaction: Transaction;
+
+      beforeEach(() => {
+        recentTransaction = wallet.createTransaction({
+          recipient: new Wallet().publicKey,
+          amount: 30,
+        });
+
+        blockchain.addBlock([recentTransaction]);
+      });
+
+      it("returns the output amount of the recent transaction", () => {
+        expect(
+          Wallet.calculateBalance({
+            chain: blockchain.chain,
+            address: wallet.publicKey,
+          })
+        ).toEqual(recentTransaction.outputMap[wallet.publicKey]);
+      });
+
+      describe("and there are outputs next to and after the recent transaction", () => {
+        let sameBlockTransaction: Transaction;
+        let nextBlockTransaction: Transaction;
+
+        beforeEach(() => {
+          recentTransaction = wallet.createTransaction({
+            recipient: new Wallet().publicKey,
+            amount: 60,
+          });
+
+          sameBlockTransaction = Transaction.rewardTransaction({
+            minerWallet: wallet,
+          });
+
+          blockchain.addBlock([recentTransaction, sameBlockTransaction]);
+          nextBlockTransaction = new Wallet().createTransaction({
+            recipient: wallet.publicKey,
+            amount: 75,
+          });
+
+          blockchain.addBlock([nextBlockTransaction]);
+        });
+
+        it("includes the output amounts in the returned balance", () => {
+          expect(
+            Wallet.calculateBalance({
+              chain: blockchain.chain,
+              address: wallet.publicKey,
+            })
+          ).toEqual(
+            recentTransaction.outputMap[wallet.publicKey] +
+              sameBlockTransaction.outputMap[wallet.publicKey] +
+              nextBlockTransaction.outputMap[wallet.publicKey]
+          );
+        });
+      });
+    });
   });
 });
