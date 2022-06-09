@@ -4,7 +4,8 @@ import {
   ITransactionProps,
   OutputMapType,
   InputTxType,
-  RewardTransactionType,
+  // IRewardTransaction,
+  // RewardInputType,
 } from "../interfaces/ITransaction";
 import { verifySignature } from "../utils/cryptoSign";
 import { Wallet } from "./Wallet";
@@ -19,12 +20,15 @@ export class Transaction {
   public input: InputTxType;
 
   constructor(transactionProps: ITransactionProps) {
+    const { input, outputMap } = transactionProps;
     this.id = v4();
-    this.outputMap = this.createOutpuMap(transactionProps);
-    this.input = this.createInput({
-      senderWallet: transactionProps.senderWallet,
-      outputMap: this.outputMap,
-    });
+    this.outputMap = outputMap || this.createOutpuMap(transactionProps);
+    this.input =
+      input ||
+      this.createInput({
+        senderWallet: transactionProps.senderWallet!,
+        outputMap: this.outputMap,
+      });
   }
 
   createInput(inputProps: InputPropsType): InputTxType {
@@ -40,23 +44,26 @@ export class Transaction {
   createOutpuMap(transactionProps: ITransactionProps) {
     const outputMap: OutputMapType = {};
     const { senderWallet, recipient, amount } = transactionProps;
-    outputMap[recipient] = amount;
-    outputMap[senderWallet.publicKey] = senderWallet.balance - amount;
+    outputMap[recipient!] = amount!;
+    outputMap[senderWallet!.publicKey] = senderWallet!.balance - amount!;
     return outputMap;
   }
 
   update(transactionProps: ITransactionProps) {
     const { senderWallet, recipient, amount } = transactionProps;
-    if (amount > this.outputMap[senderWallet.publicKey])
+    if (amount! > this.outputMap[senderWallet!.publicKey])
       throw new Error("Amount exceeds balance");
-    if (!this.outputMap[recipient]) {
-      this.outputMap[recipient] = amount;
+    if (!this.outputMap[recipient!]) {
+      this.outputMap[recipient!] = amount!;
     } else {
-      this.outputMap[recipient] += amount;
+      this.outputMap[recipient!] += amount!;
     }
-    this.outputMap[senderWallet.publicKey] =
-      this.outputMap[senderWallet.publicKey] - amount;
-    this.input = this.createInput({ senderWallet, outputMap: this.outputMap });
+    this.outputMap[senderWallet!.publicKey] =
+      this.outputMap[senderWallet!.publicKey] - amount!;
+    this.input = this.createInput({
+      senderWallet: senderWallet!,
+      outputMap: this.outputMap,
+    });
   }
 
   static isValid(transaction: Transaction): boolean {
@@ -72,7 +79,7 @@ export class Transaction {
       !verifySignature({
         publicKey: address,
         data: outputMap,
-        signature,
+        signature: signature!,
       })
     )
       return false;
@@ -83,11 +90,13 @@ export class Transaction {
     minerWallet,
   }: {
     minerWallet: Wallet;
-  }): RewardTransactionType {
-    return {
-      id: v4(),
-      input: REWARD_INPUT,
+  }): Transaction {
+    return new this({
+      input: {
+        timestamp: Date.now(),
+        address: REWARD_INPUT.address,
+      },
       outputMap: { [minerWallet.publicKey]: MINING_REWARD },
-    };
+    });
   }
 }

@@ -6,6 +6,7 @@ import { TransactionPool } from "./model/TransactionPool";
 import { Wallet } from "./model/Wallet";
 import { PubSub } from "./model/PubSub";
 import { Transaction } from "./model/Transaction";
+import { TransactionMiner } from "./model/TransactionMiner";
 
 const app = express();
 
@@ -15,6 +16,12 @@ const blockchain = new Blockchain();
 const transactionPool = new TransactionPool();
 const wallet = new Wallet();
 const pubSub = new PubSub({ blockchain, transactionPool });
+const transactionMiner = new TransactionMiner({
+  blockchain,
+  transactionPool,
+  wallet,
+  pubSub,
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -37,7 +44,11 @@ app.post("/api/v1/transaction", (req: Request, res: Response) => {
   });
   try {
     if (!transaction) {
-      transaction = wallet.createTransaction({ amount, recipient });
+      transaction = wallet.createTransaction({
+        amount,
+        recipient,
+        chain: blockchain.chain,
+      });
     } else {
       transaction.update({ senderWallet: wallet, amount, recipient });
     }
@@ -58,6 +69,21 @@ app.get("/api/v1/transaction-pool", (req: Request, res: Response) => {
   });
 });
 
+app.get("/api/v1/mine-transactions", (req: Request, res: Response) => {
+  transactionMiner.mineTransactions();
+  res.redirect("/api/v1/blocks");
+});
+
+app.get("/api/v1/wallet", (req: Request, res: Response) => {
+  const address = wallet.publicKey;
+  res
+    .status(200)
+    .json({
+      success: true,
+      address,
+      balance: Wallet.calculateBalance({ chain: blockchain.chain, address }),
+    });
+});
 const syncBlockchainState = () => {
   syncChains();
   syncTransactions();
@@ -68,7 +94,7 @@ const syncChains = async () => {
     const { data } = await axios.get(`${DEFAULT_ADDRESS}/api/v1/blocks`);
     const { blocks }: { blocks: Block[] } = data;
     console.log(blocks);
-    blockchain.replaceChain(blocks);
+    blockchain.replaceChain(blocks, () => {});
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.log("Axios error", error);
