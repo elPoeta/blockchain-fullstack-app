@@ -8,6 +8,7 @@ import { Wallet } from "./model/Wallet";
 import { PubSub } from "./model/PubSub";
 import { Transaction } from "./model/Transaction";
 import { TransactionMiner } from "./model/TransactionMiner";
+import { setDummyBlocks } from "./dev/dumyBlockchain";
 
 const app = express();
 
@@ -121,6 +122,8 @@ const syncTransactions = async () => {
     }
   }
 };
+
+setDummyBlocks(true, wallet, blockchain, transactionPool, transactionMiner);
 
 let PEER_PORT: number;
 
