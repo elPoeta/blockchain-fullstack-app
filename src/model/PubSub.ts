@@ -1,4 +1,4 @@
-import { createClient } from "redis";
+import redis from "redis";
 import { Block } from "./Block";
 import { Blockchain } from "./Blockchain";
 import { Transaction } from "./Transaction";
@@ -14,57 +14,60 @@ type PubSubPropsType = {
   blockchain: Blockchain;
   transactionPool: TransactionPool;
 };
+const REDIS_URL = "redis://127.0.0.1:6379";
+
 export class PubSub {
-  public publisher: ReturnType<typeof createClient>;
-  public subscriber: ReturnType<typeof createClient>;
+  public publisher: redis.RedisClient;
+  public subscriber: redis.RedisClient;
   public blockchain: Blockchain;
   public transactionPool: TransactionPool;
-
   constructor({ blockchain, transactionPool }: PubSubPropsType) {
     this.blockchain = blockchain;
     this.transactionPool = transactionPool;
-    this.publisher = createClient();
-    this.subscriber = this.publisher.duplicate();
+
+    this.publisher = redis.createClient(REDIS_URL);
+    this.subscriber = redis.createClient(REDIS_URL);
+
     this.subscribeToChannels();
-  }
 
-  async subscribeToChannels() {
-    await this.subscriber.connect();
-    Object.values(CHANNELS).forEach((channel) =>
-      this.subscribeChannel(channel)
-    );
-  }
-
-  async subscribeChannel(channel: string) {
-    await this.subscriber.subscribe(channel, (message) =>
+    this.subscriber.on("message", (channel, message) =>
       this.handleMessage(channel, message)
     );
   }
 
   handleMessage(channel: string, message: string) {
-    console.log(`Message recieve from channel ${channel}. Message: ${message}`);
+    console.log(`Message received. Channel: ${channel}. Message: ${message}.`);
+
+    const parsedMessage = JSON.parse(message);
+
     switch (channel) {
       case CHANNELS.BLOCKCHAIN:
-        const chain = JSON.parse(message) as Block[];
-        this.blockchain.replaceChain(chain, true, () => {
-          this.transactionPool.clearBlockchainTransactions({ chain });
+        this.blockchain.replaceChain(parsedMessage, true, () => {
+          this.transactionPool.clearBlockchainTransactions({
+            chain: parsedMessage,
+          });
         });
         break;
       case CHANNELS.TRANSACTION:
-        const transaction = JSON.parse(message) as Transaction;
-        this.transactionPool.setTransaction(transaction);
+        this.transactionPool.setTransaction(parsedMessage);
         break;
       default:
         return;
     }
   }
 
-  async publish({ channel, message }: { channel: string; message: string }) {
-    await this.publisher.connect();
-    await this.subscriber.unsubscribe(channel);
-    await this.publisher.publish(channel, message);
-    await this.publisher.quit();
-    this.subscribeChannel(channel);
+  subscribeToChannels() {
+    Object.values(CHANNELS).forEach((channel) => {
+      this.subscriber.subscribe(channel);
+    });
+  }
+
+  publish({ channel, message }: { channel: string; message: string }) {
+    this.subscriber.unsubscribe(channel, () => {
+      this.publisher.publish(channel, message, () => {
+        this.subscriber.subscribe(channel);
+      });
+    });
   }
 
   broadcastChain() {
