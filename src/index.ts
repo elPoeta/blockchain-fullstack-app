@@ -1,4 +1,5 @@
 import express, { Response, Request } from "express";
+import cors from "cors";
 import axios from "axios";
 import { Blockchain } from "./model/Blockchain";
 import { Block } from "./model/Block";
@@ -25,6 +26,7 @@ const transactionMiner = new TransactionMiner({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
 app.get("/api/v1/blocks", (req: Request, res: Response) => {
   res.status(200).json({ blocks: blockchain.chain, success: true });

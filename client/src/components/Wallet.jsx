@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 
-const App = () => {
+export const Wallet = () => {
   const [wallet, setWallet] = useState({});
 
   useEffect(() => {
     return async () => {
       const response = await fetch("/api/v1/wallet");
       const json = await response.json();
-      console.log("## ", json);
       setWallet(json);
     };
   }, []);
@@ -19,4 +18,3 @@ const App = () => {
   );
 };
 
-export default App;

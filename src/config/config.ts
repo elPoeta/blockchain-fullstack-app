@@ -8,7 +8,7 @@ export const GENESIS_DATA = {
   timestamp: 1654446893737,
   previusHash: "none",
   hash: "0000000000000000000000000000000000000000000000000000000000000000",
-  data: "",
+  data: [],
 };
 
 export const STARTING_BALANCE = 1000.0;
