@@ -11,7 +11,7 @@ export const Wallet = () => {
     };
   }, []);
   return (
-    <div className="">
+    <div className="w-[500px] break-words">
       <h3>Address: {wallet.address}</h3>
       <h3>Balance: {wallet.balance}</h3>
     </div>
