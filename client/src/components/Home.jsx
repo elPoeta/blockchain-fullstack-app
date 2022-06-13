@@ -8,6 +8,7 @@ export const Home = () => {
       <img src={logo}alt="logo" className="w-[250px] h-[250px] p-4" />
       <h1 className="font-bold text-5xl my-5">Welcome to the blockchain</h1>
       <Nav to='/blocks' title="Blocks"/>
+      <Nav to='/new-transaction' title="Create tx"/>
       <Wallet/>
     </div>
   );
