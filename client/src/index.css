@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+body,
+input {
   font-family: "Fira Code", monospace;
   background-color: #24282e;
   color: #ffffff;
