@@ -9,6 +9,7 @@ export const Home = () => {
       <h1 className="font-bold text-5xl my-5">Welcome to the blockchain</h1>
       <Nav to='/blocks' title="Blocks"/>
       <Nav to='/new-transaction' title="Create tx"/>
+      <Nav to='/transaction-pool' title="Tranaction Pool"/>
       <Wallet/>
     </div>
   );

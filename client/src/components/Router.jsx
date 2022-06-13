@@ -3,6 +3,7 @@ import { Home } from './Home';
 import { Blocks } from './Blocks';
 import { NotFound } from './NotFound';
 import { TransactionForm } from './TransactionForm';
+import { TransactionPool } from './TransactionPool';
 
 export const Router  = () => {
   return (
@@ -12,6 +13,7 @@ export const Router  = () => {
           <Route path='/' element={<Home />} />
           <Route path='/blocks' element={<Blocks />} />
           <Route path='/new-transaction' element={<TransactionForm/>} />
+          <Route path='/transaction-pool' element={<TransactionPool />} />
           <Route path='/notFound' element={<NotFound />} />
           <Route path="*" element={<Navigate to="notFound" />} />
         </Routes>

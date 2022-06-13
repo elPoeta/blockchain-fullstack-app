@@ -5,13 +5,25 @@ export const TransactionForm  = () => {
  const [transaction, setTransaction] = useState({ recipient: '', amount: 0 });
  const handleChange = ev => {
   ev.preventDefault();
-  console.log(ev.target.name)  
   setTransaction( prev => {return{...prev, [ev.target.name]: ev.target.value}});
  } 
 
- const handleSubmit = ev => {
+ const handleSubmit = async (ev) => {
   ev.preventDefault();
-  console.log('submit ',transaction)
+  const response = await fetch('/api/v1/transaction', {
+    method: 'POST',
+    mode: 'cors',
+    cache: 'no-cache',
+    credentials: 'same-origin',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    redirect: 'follow', // manual, *follow, error
+    referrerPolicy: 'no-referrer',
+    body: JSON.stringify(transaction) 
+  });
+   const json = await response.json();
+   console.log(json)
  }
 
  return(
