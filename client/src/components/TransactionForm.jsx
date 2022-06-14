@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from 'react-toastify'
 import {Nav} from './Nav';
 
 export const TransactionForm  = () => {
@@ -24,6 +25,7 @@ export const TransactionForm  = () => {
   });
    const json = await response.json();
    console.log(json)
+   toast.info("Transaction success")
  }
 
  return(
