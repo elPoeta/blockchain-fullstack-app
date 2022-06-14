@@ -15,8 +15,8 @@ export const TransactionPool = () => {
  });
 
  return(
-    <div>
-      <h3>Transaction Pool</h3>
+    <div className="grid justify-center align-middle p-4">
+      <h3 className="text-2xl p-4">Transaction Pool</h3>
        <Nav to='/' title='Home'/>
        { Object.values(transactionPoolMap).map(transaction => (
         <div key={transaction.id}>

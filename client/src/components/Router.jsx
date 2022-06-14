@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify'
 import { Home } from './Home';
 import { Blocks } from './Blocks';
 import { NotFound } from './NotFound';
@@ -18,6 +19,7 @@ export const Router  = () => {
           <Route path="*" element={<Navigate to="notFound" />} />
         </Routes>
       </BrowserRouter>
+      <ToastContainer />
     </div>
   )
 };
