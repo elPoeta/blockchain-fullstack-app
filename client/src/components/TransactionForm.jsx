@@ -4,6 +4,7 @@ import {Nav} from './Nav';
 
 export const TransactionForm  = () => {
  const [transaction, setTransaction] = useState({ recipient: '', amount: 0 });
+
  const handleChange = ev => {
   ev.preventDefault();
   setTransaction( prev => {return{...prev, [ev.target.name]: ev.target.value}});

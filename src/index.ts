@@ -85,6 +85,18 @@ app.get("/api/v1/wallet", (req: Request, res: Response) => {
     balance: Wallet.calculateBalance({ chain: blockchain.chain, address }),
   });
 });
+
+app.get("/api/v1/known-addresses", (req: Request, res: Response) => {
+  const addressMap: Record<string, string> = {};
+  for (const block of blockchain.chain as Block[]) {
+    for (const transaction of block.data as Transaction[]) {
+      const recipient = Object.keys(transaction.outputMap);
+      recipient.forEach((recipient) => (addressMap[recipient] = recipient));
+    }
+  }
+  res.status(200).json({ success: true, addresses: Object.keys(addressMap) });
+});
+
 const syncBlockchainState = () => {
   syncChains();
   syncTransactions();
