@@ -47,7 +47,7 @@ export const TransactionForm  = () => {
       </div>
      <div className="p2">
       <h4 className="text-center text-pink-600 text-2xl">Addresses</h4>
-      {addresses.map(address => <p className="p-2">{address}</p>)}
+      {addresses.map(address => <p key={address} className="p-2">{address}</p>)}
      </div> 
      <form onSubmit={handleSubmit} className="grid justify-center gap-4 p-2">
       <input className="border-white border-2 p-4" type="text" id="recipient" name="recipient" placeholder="recipient" value={transaction.recipient} onChange={ev => handleChange(ev)}/>
